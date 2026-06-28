@@ -1,6 +1,9 @@
 package webhook
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -53,7 +56,27 @@ type Repository struct {
 }
 
 func HandleGithubPushEvent(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		// TODO: create centralized error handling
+		handleError(w, http.StatusInternalServerError)
+		return
+	}
+	// Verify the signature inside verify.go
+	var event GithubPushEvent
+	err = json.Unmarshal(body, &event)
+	if err != nil {
+		// TODO: create centralized error handling
+		handleError(w, http.StatusBadRequest)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
+	fmt.Printf("Received event: %+v\n", event)
+}
+
+func handleError(w http.ResponseWriter, status int) {
+	w.WriteHeader(status)
+	return
 }
 
 // type Example struct {
