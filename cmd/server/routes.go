@@ -7,5 +7,5 @@ import (
 )
 
 func AddRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/webhook", webhook.HandleGithubPushEvent)
+	mux.HandleFunc("/webhook/github/push", webhook.HandleGithubPushEvent)
 }

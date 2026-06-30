@@ -2,6 +2,7 @@ package teams
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -78,6 +79,7 @@ func assertContains(t *testing.T, result payload, substr string) {
 	if err != nil {
 		t.Fatalf("Card failed to marshal: %v", err)
 	}
+	fmt.Printf("Card: %s\n", j)
 	if !strings.Contains(string(j), substr) {
 		t.Errorf("Card should contain %s", substr)
 	}

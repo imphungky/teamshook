@@ -13,6 +13,11 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+type serverConfig struct {
+	URL  string
+	Port string
+}
+
 func NewServer() http.Handler {
 	mux := http.NewServeMux()
 	AddRoutes(mux)
@@ -20,13 +25,27 @@ func NewServer() http.Handler {
 	return handler
 }
 
+func getServerAddress() serverConfig {
+	url, urlExists := os.LookupEnv("URL")
+	port, portExists := os.LookupEnv("PORT")
+	if !urlExists || !portExists {
+		url = "localhost"
+		port = "8080"
+	}
+	return serverConfig{
+		URL:  url,
+		Port: port,
+	}
+}
+
 func run(ctx context.Context) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
 	srv := NewServer()
+	serverConfig := getServerAddress()
 	httpServer := &http.Server{
-		Addr:    net.JoinHostPort("localhost", "8080"),
+		Addr:    net.JoinHostPort(serverConfig.URL, serverConfig.Port),
 		Handler: srv,
 	}
 
